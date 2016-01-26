@@ -37,10 +37,8 @@ to install OpenMM quickly and easily! Use the following command:
 conda install -c omnia openmm parmed
 ```
 
-Note
-~~~~
-
-If you used Miniconda, you will also need to install ``numpy`` via the command:
+Note: if you used Miniconda, you will also need to install ``numpy`` via the
+command:
 
 ```
 conda install numpy
