@@ -65,19 +65,23 @@ ff = app.ForceField(ff + '.xml')
 # Create the System object with it
 print('Creating the System...')
 if opt.shake:
+    print('Constraining bonds with hydrogens')
     constraints = app.HBonds
 else:
+    print('No constraints applied')
     constraints = None
+if opt.hmass:
+    print('Repartitioning hydrogen masses to %g daltons' % opt.hmass)
 system = ff.createSystem(pdb.topology, nonbondedMethod=app.PME,
                          nonbondedCutoff=opt.cut*u.angstroms,
                          rigidWater=opt.shake, constraints=constraints,
-                         hydrogenMass=opt.hmass)
+                         hydrogenMass=opt.hmass*u.dalton)
 
 # Now scan through our forces and change the cutoff for the van der Waals force
 # to 9 angstroms, and change our dipole convergence to 1e-6
-print('Adjusting the vdW cutoff to 9 Angstroms...')
 for force in system.getForces():
     if isinstance(force, mm.AmoebaVdwForce):
+        print('Adjusting the vdW cutoff to %g Angstroms...' % opt.vdwcut)
         force.setCutoff(opt.vdwcut*u.angstroms)
     elif isinstance(force, mm.AmoebaMultipoleForce):
         force.setMutualInducedTargetEpsilon(opt.eps)
