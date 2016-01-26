@@ -86,7 +86,7 @@ dipole tolerance in the preparatory step.
 Like with the other Python scripts here, you can use the ``-h/--help`` flags to
 get a full listing of the available options.
 
-This script will generate a CSV-formatted output file with energies and other
+This script will generate a tab-delimited output file with energies and other
 state variables, a NetCDF trajectory file (that can be analyzed alongside the
 original PDB file with any trajectory analysis program, like cpptraj and
 pytraj), and a NetCDF restart file for use in continuing the simulation.
