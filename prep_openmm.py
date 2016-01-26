@@ -35,7 +35,7 @@ group.add_argument('-v', '--vdw-cutoff', metavar='FLOAT', default=9,
 group.add_argument('-e', '--epsilon', metavar='FLOAT', default=1e-5, dest='eps',
                    help='''Convergence criteria for mutually induced polarizable
                    dipoles in the AMOEBA force field. Default is %(default)g.
-                   This option is ignored for fixed-charge FFs''')
+                   This option is ignored for fixed-charge FFs''', type=float)
 group = parser.add_argument_group('Integration-related options')
 group.add_argument('-m', '--hydrogen-mass', metavar='FLOAT', default=None,
                    type=float, help='''Mass of hydrogen atoms (in daltons) to
@@ -72,10 +72,13 @@ else:
     constraints = None
 if opt.hmass:
     print('Repartitioning hydrogen masses to %g daltons' % opt.hmass)
+    hmass = opt.hmass * u.dalton
+else:
+    hmass = None
 system = ff.createSystem(pdb.topology, nonbondedMethod=app.PME,
                          nonbondedCutoff=opt.cut*u.angstroms,
                          rigidWater=opt.shake, constraints=constraints,
-                         hydrogenMass=opt.hmass*u.dalton)
+                         hydrogenMass=hmass)
 
 # Now scan through our forces and change the cutoff for the van der Waals force
 # to 9 angstroms, and change our dipole convergence to 1e-6
@@ -84,6 +87,7 @@ for force in system.getForces():
         print('Adjusting the vdW cutoff to %g Angstroms...' % opt.vdwcut)
         force.setCutoff(opt.vdwcut*u.angstroms)
     elif isinstance(force, mm.AmoebaMultipoleForce):
+        print('Setting the induced dipole convergence criteria to %g' % opt.eps)
         force.setMutualInducedTargetEpsilon(opt.eps)
 
 # Now we are done creating our system. Let's serialize it by writing an XML file
