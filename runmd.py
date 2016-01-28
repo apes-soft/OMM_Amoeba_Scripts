@@ -98,18 +98,18 @@ if opt.ntp:
     system.addForce(baro)
 
 if opt.gamma_ln == 0.0 and not opt.nve:
-    print('Adding Anderson thermostat at %sK, 10 psec^-1' % opt.temp); sys.stdout.flush()
+    print('Adding Anderson thermostat at %sK, 0.1 psec^-1' % opt.temp); sys.stdout.flush()
     thermo = mm.AndersenThermostat(opt.temp*u.kelvin, 0.1/u.picosecond)
     system.addForce(thermo)
-    
+
 # Create the simulation
 if opt.gamma_ln > 0.0:
-    integrator = mm.LangevinIntegrator(opt.temp*u.kelvin, 
+    integrator = mm.LangevinIntegrator(opt.temp*u.kelvin,
                  opt.gamma_ln/u.picosecond, opt.timestep*u.femtoseconds)
-    print('Langevin: %8.2fK, %8.2f ps-1, %8.2f fs' % 
+    print('Langevin: %8.2fK, %8.2f ps-1, %8.2f fs' %
        (opt.temp, opt.gamma_ln, opt.timestep) ); sys.stdout.flush()
 else:
-    integrator = mm.VerletIntegrator(opt.timestep*u.femtoseconds) 
+    integrator = mm.VerletIntegrator(opt.timestep*u.femtoseconds)
     print('Verlet: %8.2f fs' % opt.timestep )
 
 sim = app.Simulation(pdb.topology, system, integrator,
@@ -130,7 +130,7 @@ sim.reporters.append(
 )
 
 if opt.state is not None:
-    print('Setting coordinates and velocities from restart file %s' % 
+    print('Setting coordinates and velocities from restart file %s' %
         opt.state); sys.stdout.flush()
 
     if opt.state[-3:] == 'xml':
@@ -139,9 +139,14 @@ if opt.state is not None:
     else:
 #       jason's code that is supposed to work for any restart file type:
         rst = pmd.load_file(opt.state)
-        sim.context.setPositions(rst.coordinates[0]*u.angstroms)
-        sim.context.setVelocities(rst.velocities[0]*u.angstroms/u.picoseconds)
+        sim.context.setPositions(rst.coordinates[-1]*u.angstroms)
+        sim.context.setVelocities(rst.velocities[-1]*u.angstroms/u.picoseconds)
         sim.context.setPeriodicBoxVectors(*pmd.geometry.box_lengths_and_angles_to_vectors(*rst.box))
+        if hasattr(rst, 'time'):
+            try:
+                sim.context.setTime(rst.time[-1])
+            except TypeError:
+                sim.context.setTime(rst.time)
 
 else:
     print('Setting coordinates from PDB file %s' % opt.pdb); sys.stdout.flush()
