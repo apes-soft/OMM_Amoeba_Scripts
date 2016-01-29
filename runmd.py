@@ -10,45 +10,53 @@ from argparse import ArgumentParser
 import sys
 
 parser = ArgumentParser()
-parser.add_argument('--xml', dest='xml', default='system.xml', metavar='FILE',
-                    help='''OpenMM System XML file. Default is %(default)s''')
-parser.add_argument('-p', '--pdb', dest='pdb', metavar='<PDB_FILE>', required=True,
-                    help='''PDB file with coordinates for all atoms. Is also the
-                    reference coordinates''')
-parser.add_argument('-s', '--state', dest='state', metavar='FILE', default=None,
-                    help='''Restart file (any format)''')
-parser.add_argument('--restrain', dest='restraints', metavar='MASK',
-                    help='restraint mask (default None)', default=None)
-parser.add_argument('-k', '--force-constant', dest='force_constant', type=float,
-                    metavar='FLOAT', help='''Force constant for cartesian
-                    constraints. Default 10 kcal/mol/A^2''', default=10)
-parser.add_argument('-r', '--restart', dest='restart', default='restart.nc',
-                    metavar='FILE', help='''NetCDF file with information to
-                    restart the simulation with another run''')
-parser.add_argument('-o' , '--output', dest='output', default=sys.stdout,
-                    metavar='FILE', help='''Output file for energies''')
-parser.add_argument('-x', '--trajectory', dest='trajectory', default='md.nc',
-                    metavar='FILE', help='''NetCDF trajectory to generate.
-                    Snapshots written every --interval steps.''')
-parser.add_argument('-n', '--num-steps', dest='num_steps', required=True, type=int,
-                    help='Number of MD steps to run. Required', metavar='INT')
-parser.add_argument('--interval', dest='interval', default=500, metavar='INT',
-                    help='Interval between printing state data. Default 500',
-                    type=int)
-parser.add_argument('--ntp', dest='ntp', default=False, action='store_true',
-                    help='Do constant pressure simulation')
-parser.add_argument('--aniso', dest='aniso', default=False, action='store_true',
-                    help='Do anisotropic pressure scaling')
-parser.add_argument('--dt', dest='timestep', type=float,
-                    metavar='FLOAT', help='''time step for Langevin
-                    integrator. Default 1 fs''', default=1.0)
-parser.add_argument('--gamma_ln', dest='gamma_ln', type=float,
-                    metavar='FLOAT', help='''collision frequency for Langevin
-                    integrator. Default 1 ps-1''', default=1.0)
-parser.add_argument('--temp', dest='temp', type=float,
-                    metavar='FLOAT', help='''target temperature for NVT
-                    simulation. Default %(default)s K''', default=300.0)
-parser.add_argument('--nve', dest='nve', default=False, action='store_true',
+group = parser.add_argument_group('Input File Options')
+group.add_argument('--xml', dest='xml', default='system.xml', metavar='FILE',
+                   help='''OpenMM System XML file. Default is %(default)s''')
+group.add_argument('-p', '--pdb', dest='pdb', metavar='<PDB_FILE>', required=True,
+                   help='''PDB file with coordinates for all atoms. Is also the
+                   reference coordinates''')
+group.add_argument('-s', '--state', dest='state', metavar='FILE', default=None,
+                   help='''Restart file (any format)''')
+group = parser.add_argument_group('Positional Restraint Options')
+group.add_argument('--restrain', dest='restraints', metavar='MASK',
+                   help='restraint mask (default None)', default=None)
+group.add_argument('-k', '--force-constant', dest='force_constant', type=float,
+                   metavar='FLOAT', help='''Force constant for cartesian
+                   constraints. Default 10 kcal/mol/A^2''', default=10)
+group = parser.add_argument_group('Output File Options')
+group.add_argument('-r', '--restart', dest='restart', default='restart.nc',
+                   metavar='FILE', help='''NetCDF file with information to
+                   restart the simulation with another run''')
+group.add_argument('-o' , '--output', dest='output', default=sys.stdout,
+                   metavar='FILE', help='''Output file for energies''')
+group.add_argument('-x', '--trajectory', dest='trajectory', default='md.nc',
+                   metavar='FILE', help='''NetCDF trajectory to generate.
+                   Snapshots written every --interval steps.''')
+group.add_argument('--checkpoint', dest='checkpoint', metavar='FILE',
+                   default=None, help='''Name of a checkpoint file to write
+                   periodically throughout the simulation. Primarily useful for
+                   debugging intermittent and rare errors.''')
+group.add_argument('--interval', dest='interval', default=500, metavar='INT',
+                   help='Interval between printing state data. Default 500',
+                   type=int)
+group = parser.add_argument_group('Simulation Options')
+group.add_argument('-n', '--num-steps', dest='num_steps', required=True, type=int,
+                   help='Number of MD steps to run. Required', metavar='INT')
+group.add_argument('--ntp', dest='ntp', default=False, action='store_true',
+                   help='Do constant pressure simulation')
+group.add_argument('--aniso', dest='aniso', default=False, action='store_true',
+                   help='Do anisotropic pressure scaling')
+group.add_argument('--dt', dest='timestep', type=float,
+                   metavar='FLOAT', help='''time step for Langevin
+                   integrator. Default 1 fs''', default=1.0)
+group.add_argument('--gamma_ln', dest='gamma_ln', type=float,
+                   metavar='FLOAT', help='''collision frequency for Langevin
+                   integrator. Default 1 ps-1''', default=1.0)
+group.add_argument('--temp', dest='temp', type=float,
+                   metavar='FLOAT', help='''target temperature for NVT
+                   simulation. Default %(default)s K''', default=300.0)
+group.add_argument('--nve', dest='nve', default=False, action='store_true',
                     help='Do constant energy simulation')
 
 opt = parser.parse_args()
@@ -128,6 +136,10 @@ sim.reporters.append(
 sim.reporters.append(
         pmd.openmm.RestartReporter(opt.restart, opt.interval*100, netcdf=True)
 )
+if opt.checkpoint is not None:
+    sim.reporters.append(
+            app.CheckpointReporter(opt.checkpoint, opt.interval*100)
+    )
 
 if opt.state is not None:
     print('Setting coordinates and velocities from restart file %s' %
