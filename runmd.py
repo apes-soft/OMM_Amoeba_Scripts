@@ -138,7 +138,7 @@ sim.reporters.append(
 )
 if opt.checkpoint is not None:
     sim.reporters.append(
-            app.CheckpointReporter(opt.checkpoint, opt.interval*100)
+            app.CheckpointReporter(opt.checkpoint, opt.interval*10)
     )
 
 if opt.state is not None:
