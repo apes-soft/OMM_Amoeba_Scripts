@@ -148,6 +148,8 @@ if opt.state is not None:
     if opt.state[-3:] == 'xml':
         with open(opt.state, 'r') as f:
             sim.context.setState(mm.XmlSerializer.deserialize(f.read()))
+    elif opt.state[-3:] == 'chk':
+        sim.loadCheckpoint(opt.state)
     else:
 #       jason's code that is supposed to work for any restart file type:
         rst = pmd.load_file(opt.state)
