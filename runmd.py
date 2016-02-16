@@ -48,8 +48,13 @@ group.add_argument('--ntp', dest='ntp', default=False, action='store_true',
 group.add_argument('--aniso', dest='aniso', default=False, action='store_true',
                    help='Do anisotropic pressure scaling')
 group.add_argument('--dt', dest='timestep', type=float,
-                   metavar='FLOAT', help='''time step for Langevin
-                   integrator. Default 1 fs''', default=1.0)
+                   metavar='FLOAT', help='''time step for integrator (outer
+                   time-step for RESPA integrator) Default 1 fs''', default=1.0)
+group.add_argument('--nrespa', dest='nrespa', type=int, metavar='INT',
+                   default=1, help='''Number of inner time steps to run
+                   (evaluating fast forces) for every outer timestep. Default is
+                   1 (no RESPA). Best value to use for AMOEBA is at most 2. Only
+                   AMOEBA is supported.''')
 group.add_argument('--gamma_ln', dest='gamma_ln', type=float,
                    metavar='FLOAT', help='''collision frequency for Langevin
                    integrator. Default 1 ps-1''', default=1.0)
@@ -112,10 +117,35 @@ if opt.gamma_ln == 0.0 and not opt.nve:
 
 # Create the simulation
 if opt.gamma_ln > 0.0:
+    if opt.nrespa > 1:
+        raise ValueError('nrespa and Langevin dynamics are incompatible')
     integrator = mm.LangevinIntegrator(opt.temp*u.kelvin,
                  opt.gamma_ln/u.picosecond, opt.timestep*u.femtoseconds)
     print('Langevin: %8.2fK, %8.2f ps-1, %8.2f fs' %
        (opt.temp, opt.gamma_ln, opt.timestep) ); sys.stdout.flush()
+elif opt.nrespa > 1:
+    slow = (mm.AmoebaMultipoleForce, mm.AmoebaVdwForce,
+            mm.AmoebaGeneralizedKirkwoodForce, mm.AmoebaWcaDispersionForce)
+    found_slow = False
+    for force in system.getForces():
+        if isinstance(force, slow):
+            found_slow = True
+            force.setForceGroup(1)
+        else:
+            force.setForceGroup(0)
+    if not found_slow:
+        raise ValueError('No slow AMOEBA forces found for MTS integrator!')
+    # The list given to MTSIntegrator defining the time steps and force
+    # decompositions is a list of 2-element tuples where the first element is
+    # a force group and the second element is how many times to evaluate that
+    # force group each "outer" time-step. So [(0, opt.nrespa), (1, 1)] means
+    # force group 0 is executed nrespa times each time step and force group 1 is
+    # executed only once. The slow forces are defined above as force group 1 and
+    # all others as force group 0.
+    integrator = mm.MTSIntegrator(opt.timestep*u.femtoseconds,
+                                  [(0, opt.nrespa), (1, 1)])
+    print('RESPA MTS Integrator: %8.2f fs outer time-step with %d inner steps' %
+          (opt.timestep, opt.nrespa))
 else:
     integrator = mm.VerletIntegrator(opt.timestep*u.femtoseconds)
     print('Verlet: %8.2f fs' % opt.timestep )
