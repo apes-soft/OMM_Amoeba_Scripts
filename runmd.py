@@ -57,7 +57,7 @@ group.add_argument('--nrespa', dest='nrespa', type=int, metavar='INT',
                    AMOEBA is supported.''')
 group.add_argument('--gamma_ln', dest='gamma_ln', type=float,
                    metavar='FLOAT', help='''collision frequency for Langevin
-                   integrator. Default 1 ps-1''', default=1.0)
+                   integrator. Default %(default)s ps-1''', default=0.0)
 group.add_argument('--temp', dest='temp', type=float,
                    metavar='FLOAT', help='''target temperature for NVT
                    simulation. Default %(default)s K''', default=300.0)
