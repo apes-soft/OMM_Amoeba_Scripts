@@ -81,6 +81,8 @@ with open(opt.xml, 'r') as f:
     system = mm.XmlSerializer.deserialize(f.read())
 
 if opt.hawkeye:
+    if opt.nrespa > 1:
+        raise ValueError('Cannot use MTS integrator and watch for errors')
     groups_and_names = []
     for i, force in enumerate(system.getForces()):
 #       if isinstance(force, mm.AmoebaMultipoleForce):
