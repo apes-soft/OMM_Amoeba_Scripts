@@ -119,6 +119,7 @@ if opt.hawkeye:
             ene = state.getPotentialEnergy().value_in_unit(u.kilojoules_per_mole)
             if not math.isnan(ene) and ene < 1e5:
                 return
+            print('%30s %.6f kcal/mol' % ('Total Energy', ene.value_in_unit(u.kilocalories_per_mole)))
             for name, i in self.groups_and_names:
                 ene = simulation.context.getState(getEnergy=True, groups=1<<i).getPotentialEnergy().value_in_unit(u.kilocalories_per_mole)
                 print('%30s %.6f kcal/mol' % (name, ene), file=sys.stderr)
