@@ -121,11 +121,9 @@ if opt.hawkeye:
                 return
             for name, i in self.groups_and_names:
                 ene = simulation.context.getState(getEnergy=True, groups=1<<i).getPotentialEnergy().value_in_unit(u.kilocalories_per_mole)
-                print('%20s %.6f kcal/mol\n' % (name, ene), file=sys.stderr)
+                print('%30s %.6f kcal/mol' % (name, ene), file=sys.stderr)
+            sys.exit('Bad energy! Look at components')
     
-        def __del__(self):
-            self.fobj.close()
-
 # Remove the andersen thermostat that might exist (e.g. from Tinker)
 for i in range(system.getNumForces()):
     if isinstance(system.getForce(i), mm.AndersenThermostat):
