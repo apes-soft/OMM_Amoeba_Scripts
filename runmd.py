@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+from __future__ import print_function
+import math
 
 import parmed as pmd
 from parmed import unit as u
@@ -63,6 +65,12 @@ group.add_argument('--temp', dest='temp', type=float,
                    simulation. Default %(default)s K''', default=300.0)
 group.add_argument('--nve', dest='nve', default=False, action='store_true',
                     help='Do constant energy simulation')
+group.add_argument('--watch-for-errors', dest='hawkeye', default=False,
+                   action='store_true',
+                   help='''Watch energy every step and if energy becomes large
+                   or NaN, print out each component to find where the energy is
+                   blowing up. This may slow the simulation down considerably,
+                   so it is primarily of use when debugging.''')
 
 opt = parser.parse_args()
 
@@ -71,6 +79,52 @@ print('Command line:\n\t%s' % ' '.join(sys.argv)); sys.stdout.flush()
 print('Parsing XML file %s' % opt.xml); sys.stdout.flush()
 with open(opt.xml, 'r') as f:
     system = mm.XmlSerializer.deserialize(f.read())
+
+if opt.hawkeye:
+    if opt.nrespa > 1:
+        raise ValueError('Cannot use MTS integrator and watch for errors')
+    groups_and_names = []
+    for i, force in enumerate(system.getForces()):
+#       if isinstance(force, mm.AmoebaMultipoleForce):
+#           # Skip the multipole force, since it's so expensive
+#           force.setForceGroup(20)
+#           continue
+        groups_and_names.append((type(force).__name__, i))
+        force.setForceGroup(i)
+    
+    class ErrorDetectionReporter(app.StateDataReporter):
+        def __init__(self, groups_and_names):
+            self._reportInterval = 1
+            self.groups_and_names = groups_and_names
+
+        def describeNextReport(self, simulation):
+            """Get information about the next report this object will generate.
+    
+            Parameters
+            ----------
+            simulation : Simulation
+                The Simulation to generate a report for
+    
+            Returns
+            -------
+            tuple
+                A five element tuple. The first element is the number of steps
+                until the next report. The remaining elements specify whether
+                that report will require positions, velocities, forces, and
+                energies respectively.
+            """
+            return 1, False, False, False, True # only need energies
+
+        def report(self, simulation, state):
+            ene = state.getPotentialEnergy().value_in_unit(u.kilojoules_per_mole)
+            if not math.isnan(ene) and ene < 1e5:
+                return
+            for name, i in self.groups_and_names:
+                ene = simulation.context.getState(getEnergy=True, groups=1<<i).getPotentialEnergy().value_in_unit(u.kilocalories_per_mole)
+                print('%20s %.6f kcal/mol\n' % (name, ene), file=sys.stderr)
+    
+        def __del__(self):
+            self.fobj.close()
 
 # Remove the andersen thermostat that might exist (e.g. from Tinker)
 for i in range(system.getNumForces()):
@@ -153,6 +207,10 @@ else:
 sim = app.Simulation(pdb.topology, system, integrator,
                      mm.Platform.getPlatformByName('CUDA'),
                      dict(CudaPrecision='mixed') )
+if opt.hawkeye:
+    # Watch every step... slow!
+    sim.reporters.append(ErrorDetectionReporter(groups_and_names))
+
 sim.reporters.append(
         pmd.openmm.StateDataReporter(opt.output, reportInterval=opt.interval,
                         volume=True,density=True,separator='\t')
