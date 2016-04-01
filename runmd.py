@@ -2,14 +2,112 @@
 from __future__ import print_function
 import math
 
+import numpy as np
 import parmed as pmd
 from parmed import unit as u
 
 from simtk import openmm as mm
-from simtk.openmm import app
+from simtk.unit import *
+from simtk.openmm.app import *
+from simtk.openmm import *
 
 from argparse import ArgumentParser
 import sys
+
+def MTSVVVRIntegrator(temperature, collision_rate, timestep, system, ninnersteps=4):
+    """
+    Create a multiple timestep velocity verlet with velocity randomization (VVVR) integrator.
+    Taken from https://github.com/leeping/forcebalance, by Lee-Ping Wang
+    
+    ARGUMENTS
+
+    temperature (Quantity compatible with kelvin) - the temperature
+    collision_rate (Quantity compatible with 1/picoseconds) - the collision rate
+    timestep (Quantity compatible with femtoseconds) - the integration timestep
+    system (simtk.openmm.System) - system whose forces will be partitioned
+    ninnersteps (int) - number of inner timesteps (default: 4)
+
+    RETURNS
+
+    integrator (openmm.CustomIntegrator) - a VVVR integrator
+
+    NOTES
+    
+    This integrator is equivalent to a Langevin integrator in the velocity Verlet discretization with a
+    timestep correction to ensure that the field-free diffusion constant is timestep invariant.  The inner
+    velocity Verlet discretization is transformed into a multiple timestep algorithm.
+
+    REFERENCES
+
+    VVVR Langevin integrator: 
+    * http://arxiv.org/abs/1301.3800
+    * http://arxiv.org/abs/1107.2967 (to appear in PRX 2013)    
+    
+    TODO
+
+    Move initialization of 'sigma' to setting the per-particle variables.
+    
+    """
+    # Multiple timestep Langevin integrator.
+    for i in system.getForces():
+        if i.__class__.__name__ in ["NonbondedForce", "CustomNonbondedForce", "AmoebaVdwForce", "AmoebaMultipoleForce", "MonteCarloBarostat"]:
+            # Slow force.
+            print('   %s is a Slow Force' % i.__class__.__name__);
+            # logger.info(i.__class__.__name__ + " is a Slow Force\n")
+            i.setForceGroup(1)
+        else:
+            # Fast force.
+            print('   %s is a Fast Force' % i.__class__.__name__);
+            # logger.info(i.__class__.__name__ + " is a Fast Force\n")
+            i.setForceGroup(0)
+
+    kB = BOLTZMANN_CONSTANT_kB * AVOGADRO_CONSTANT_NA
+    kT = kB * temperature
+    
+    integrator = CustomIntegrator(timestep)
+    
+    integrator.addGlobalVariable("dt_fast", timestep/float(ninnersteps)) # fast inner timestep
+    integrator.addGlobalVariable("kT", kT) # thermal energy
+    integrator.addGlobalVariable("a", np.exp(-collision_rate*timestep)) # velocity mixing parameter
+    integrator.addGlobalVariable("b", np.sqrt((2/(collision_rate*timestep)) * np.tanh(collision_rate*timestep/2))) # timestep correction parameter
+    integrator.addPerDofVariable("sigma", 0) 
+    integrator.addPerDofVariable("x1", 0) # position before application of constraints
+
+    #
+    # Pre-computation.
+    # This only needs to be done once, but it needs to be done for each degree of freedom.
+    # Could move this to initialization?
+    #
+    integrator.addComputePerDof("sigma", "sqrt(kT/m)")
+
+    # 
+    # Velocity perturbation.
+    #
+    integrator.addComputePerDof("v", "sqrt(a)*v + sqrt(1-a)*sigma*gaussian")
+    integrator.addConstrainVelocities();
+    
+    #
+    # Symplectic inner multiple timestep.
+    #
+    integrator.addUpdateContextState(); 
+    integrator.addComputePerDof("v", "v + 0.5*b*dt*f1/m")
+    for innerstep in range(ninnersteps):
+        # Fast inner symplectic timestep.
+        integrator.addComputePerDof("v", "v + 0.5*b*dt_fast*f0/m")
+        integrator.addComputePerDof("x", "x + v*b*dt_fast")
+        integrator.addComputePerDof("x1", "x")
+        integrator.addConstrainPositions();        
+        integrator.addComputePerDof("v", "v + 0.5*b*dt_fast*f0/m + (x-x1)/dt_fast")
+    integrator.addComputePerDof("v", "v + 0.5*b*dt*f1/m") # TODO: Additional velocity constraint correction?
+    integrator.addConstrainVelocities();
+
+    #
+    # Velocity randomization
+    #
+    integrator.addComputePerDof("v", "sqrt(a)*v + sqrt(1-a)*sigma*gaussian")
+    integrator.addConstrainVelocities();
+
+    return integrator
 
 parser = ArgumentParser()
 group = parser.add_argument_group('Input File Options')
@@ -52,6 +150,9 @@ group.add_argument('--aniso', dest='aniso', default=False, action='store_true',
 group.add_argument('--dt', dest='timestep', type=float,
                    metavar='FLOAT', help='''time step for integrator (outer
                    time-step for RESPA integrator) Default 1 fs''', default=1.0)
+group.add_argument('--tfreq', dest='tfreq', type=float,
+                   metavar='FLOAT', help='''frequency for Andersen thermostat.
+                   Default 0.1 ps^-1''', default=0.1)
 group.add_argument('--nrespa', dest='nrespa', type=int, metavar='INT',
                    default=1, help='''Number of inner time steps to run
                    (evaluating fast forces) for every outer timestep. Default is
@@ -171,11 +272,16 @@ if opt.gamma_ln == 0.0 and not opt.nve:
 # Create the simulation
 if opt.gamma_ln > 0.0:
     if opt.nrespa > 1:
-        raise ValueError('nrespa and Langevin dynamics are incompatible')
-    integrator = mm.LangevinIntegrator(opt.temp*u.kelvin,
-                 opt.gamma_ln/u.picosecond, opt.timestep*u.femtoseconds)
-    print('Langevin: %8.2fK, %8.2f ps-1, %8.2f fs' %
-       (opt.temp, opt.gamma_ln, opt.timestep) ); sys.stdout.flush()
+        integrator = MTSVVVRIntegrator(opt.temp*u.kelvin,
+               opt.gamma_ln/u.picosecond, opt.timestep*u.femtoseconds,
+               system, opt.nrespa)
+        print('MTSVVVR: %8.2fK, %8.2f ps-1, %8.2f fs, %3d inner steps' %
+               (opt.temp, opt.gamma_ln, opt.timestep, opt.nrespa) ); sys.stdout.flush()
+    else:
+        integrator = mm.LangevinIntegrator(opt.temp*u.kelvin,
+               opt.gamma_ln/u.picosecond, opt.timestep*u.femtoseconds)
+        print('Langevin: %8.2fK, %8.2f ps-1, %8.2f fs' %
+               (opt.temp, opt.gamma_ln, opt.timestep) ); sys.stdout.flush()
 elif opt.nrespa > 1:
     slow = (mm.AmoebaMultipoleForce, mm.AmoebaVdwForce,
             mm.AmoebaGeneralizedKirkwoodForce, mm.AmoebaWcaDispersionForce)
@@ -221,7 +327,7 @@ sim.reporters.append(
         pmd.openmm.NetCDFReporter(opt.trajectory, opt.interval*10)
 )
 sim.reporters.append(
-        pmd.openmm.RestartReporter(opt.restart, opt.interval*100, netcdf=True)
+        pmd.openmm.RestartReporter(opt.restart, 99999999, netcdf=True)
 )
 if opt.checkpoint is not None:
     sim.reporters.append(
