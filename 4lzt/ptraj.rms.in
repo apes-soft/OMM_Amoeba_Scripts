@@ -1,0 +1,5 @@
+parm 4lzt_uc.pdb
+reference 4lzt_uc.pdb
+trajin md1.x
+rms reference bb ':3-127@N,CA,C' out rms.dat
+go
