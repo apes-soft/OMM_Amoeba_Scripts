@@ -31,17 +31,13 @@ following tools installed:
 The easiest way to get all of this up and working is to install
 [Anaconda](https://www.continuum.io/downloads) or
 [Miniconda](http://conda.pydata.org/miniconda.html). You can then use ``conda``
-to install OpenMM quickly and easily! Use the following command:
+to install OpenMM quickly and easily! Use the following commands:
 
 ```
-conda install -c omnia openmm parmed
-```
-
-Note: if you used Miniconda, you will also need to install ``numpy`` via the
-command:
-
-```
-conda install numpy
+conda create -n openmm  omnia openmm parmed netCDF4 numpy  # only done once!
+conda activate openmm
+   #  do work here as described below
+conda deactivate
 ```
 
 Preparing your system
