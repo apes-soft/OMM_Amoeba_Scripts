@@ -2,14 +2,27 @@ What is this repo?
 ==================
 
 This is a repository with some preparatory scripts for getting started running
-the AMOEBA force field using OpenMM.
+the AMOEBA force field using OpenMM.  Jason Swails originated this project,
+and Dave Case added some tweaks and documentation.
 
-This workflow utilizes *only* OpenMM, even using the modelling utilities inside
+A warning: this code is still in a preliminary stage, and is not for the
+faint of heart.  It was written to allow people familiar with Amber to run
+GPU-accelerated codes with the Amoeba force field.  The expected use-case
+is that system preparation and analysis would use AmberTools, and that
+the minimization and MD steps would use OpenMM.  (There is little that is
+specific to the Amoeba force field, and that package could in principle be
+modified to use any other force field supported by OpenMM.)
+
+This workflow utilizes *only* OpenMM, even using its modelling utilities
 to parametrize the system. You do *not* need to install the Tinker-OpenMM
 interface to use this workflow.
 
-However, this is incapable of handling non-standard residues. You will need to
-use the standard Tinker workflow in that case.
+However, this is incapable of handling non-standard residues. You would
+need to use procedures available in Tinker to create the force fields
+for these, then hand-edit the amoeba2013_dac.xml file to add them.  I
+don't have any instructions here, but if you compare amoeba2013_dac.xml
+to the amoeba2013.xml that comes with OpenMM, you can see how I added a
+non-covalent ligand.  Follow the same procedure for your ligand.
 
 Getting started
 ===============
@@ -86,3 +99,18 @@ This script will generate a tab-delimited output file with energies and other
 state variables, a NetCDF trajectory file (that can be analyzed alongside the
 original PDB file with any trajectory analysis program, like cpptraj and
 pytraj), and a NetCDF restart file for use in continuing the simulation.
+
+BUGS
+====
+
+Only amoebapro2013 (and earlier) force fields are currently offered in
+OpenMM.  Comments in the OpenMM source indicate that support for more recent
+versions of Amoeba, and for things like nucleic acids, are planned.
+
+These scripts appear to work with OpenMM as of January, 2021.  But they are
+not associated with that project, and may not track changes with OpenMM.
+Users should be sure to compare short simulations with those you get from
+Tinker, gem.pmemd (part of AmberTools) or other programs to verify accuracy.
+That said, these scripts are short and simple, and just call OpenMM
+functionality, so they should benefit from all the testing done by the
+OpenMM community.
