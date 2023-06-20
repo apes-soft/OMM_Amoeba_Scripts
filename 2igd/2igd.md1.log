@@ -1,0 +1,12 @@
+Command line:
+	/home/case/mm/OMM_Amoeba_Scripts/runmd.py --xml system.xml -p 2igd_solvated.pdb -x 2igd.md1.nc -r 2igd.md1.x -o 2igd.md1.o -s 2igd.md0.x -n 10000 --interval 500 --gamma_ln 5.0
+Parsing XML file system.xml
+No Andersen thermostat found in the system.xml file
+Parsing PDB file 2igd_solvated.pdb
+Langevin:   300.00K,     5.00 ps-1,     1.00 fs
+Setting coordinates and velocities from restart file 2igd.md0.x
+Running the simulation for 10000 steps!
+/home/case/amber20/lib/python3.7/site-packages/parmed/amber/netcdffiles.py:409: UserWarning: Could not find netCDF4 module. Falling back on scipy implementation, which can significantly slow down simulations if used as a reporter
+  warnings.warn('Could not find netCDF4 module. Falling back on '
+/home/case/amber20/lib/python3.7/site-packages/parmed/amber/netcdffiles.py:83: UserWarning: Could not find netCDF4 module. Falling back on scipy implementation, which can significantly slow down simulations if used as a reporter
+  warnings.warn('Could not find netCDF4 module. Falling back on '
