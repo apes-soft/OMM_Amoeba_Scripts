@@ -47,7 +47,7 @@ The easiest way to get all of this up and working is to install
 to install OpenMM quickly and easily! Use the following commands:
 
 ```
-conda create -n openmm  omnia openmm parmed netCDF4 numpy  # only done once!
+conda create -n openmm conda-forge parmed netCDF4 numpy  # only done once!
 conda activate openmm
    #  do work here as described below
 conda deactivate
