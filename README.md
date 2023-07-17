@@ -103,9 +103,8 @@ pytraj), and a NetCDF restart file for use in continuing the simulation.
 BUGS
 ====
 
-Only amoebapro2013 (and earlier) force fields are currently offered in
-OpenMM.  Comments in the OpenMM source indicate that support for more recent
-versions of Amoeba, and for things like nucleic acids, are planned.
+Only amoebapro2018 (and earlier) force fields are currently offered in
+OpenMM.
 
 These scripts appear to work with OpenMM as of January, 2021.  But they are
 not associated with that project, and may not track changes with OpenMM.
