@@ -47,7 +47,8 @@ The easiest way to get all of this up and working is to install
 to install OpenMM quickly and easily! Use the following commands:
 
 ```
-conda create -n openmm conda-forge parmed netCDF4 numpy  # only done once!
+conda create -n openmm -c conda-forge openmm parmed netCDF4 numpy # only done once!
+
 conda activate openmm
    #  do work here as described below
 conda deactivate
@@ -63,11 +64,11 @@ AmberTools suite of programs) that has unit cell information (stored as a
 
 To use ``prep_openmm.py``, you can ask for help via the ``--help`` flag. A
 sample command-line that will create a ``system.xml`` file from
-``structure.pdb`` using the AMOEBA 2013 protein force field is shown below:
+``structure.pdb`` using the AMOEBA 2018 biomolecule force field is shown below:
 
 
 ```
-prep_openmm.py -p structure.pdb -f amoeba2013 -s system.xml
+prep_openmm.py -p structure.pdb -f amoeba2018 -s system.xml
 ```
 
 For standard AMOEBA simulations, most of the defaults are appropriate. This is
@@ -103,10 +104,9 @@ pytraj), and a NetCDF restart file for use in continuing the simulation.
 BUGS
 ====
 
-Only amoebapro2018 (and earlier) force fields are currently offered in
-OpenMM.
+Only amoeba2018 (and earlier) force fields are currently offered in OpenMM.
 
-These scripts appear to work with OpenMM as of January, 2021.  But they are
+These scripts appear to work with OpenMM as of July, 2023.  But they are
 not associated with that project, and may not track changes with OpenMM.
 Users should be sure to compare short simulations with those you get from
 Tinker, gem.pmemd (part of AmberTools) or other programs to verify accuracy.
