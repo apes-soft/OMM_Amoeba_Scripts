@@ -6,7 +6,7 @@ import parmed as pmd
 u = pmd.unit
 
 pdb = PDBFile('2igd_solvated.pdb')
-forcefield = ForceField('amber14-all.xml', 'amber14/tip3pfb.xml')
+forcefield = ForceField('../amoeba2018.xml')
 system = forcefield.createSystem(pdb.topology, nonbondedMethod=PME,
         nonbondedCutoff=1*nanometer, constraints=HBonds)
 integrator = LangevinMiddleIntegrator(300*kelvin, 1/picosecond, 0.004*picoseconds)
@@ -17,8 +17,11 @@ e=simulation.context.getState(getEnergy=True).getPotentialEnergy()
 print(' Initial energy = %10.4f kcal/mol' % e.value_in_unit(u.kilocalories_per_mole))
 
 # Now write a serialized state that has coordinates
-print('Writing serialized XML restart file...')
+print('Serializing the System...')
 with open('system2.xml', 'w') as f:
+    f.write(openmm.XmlSerializer.serialize(system))
+print('Writing serialized XML restart file...')
+with open('restart.xml', 'w') as f:
     f.write(
             openmm.XmlSerializer.serialize(
                 simulation.context.getState(
