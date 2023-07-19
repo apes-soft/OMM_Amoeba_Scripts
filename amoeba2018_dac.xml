@@ -5851,6 +5851,7 @@
   <Bond class1="83" class2="84" length="0.16060000000000002" k="133888.0"/>
   <Bond class1="84" class2="85" length="0.1496" k="292880.0"/>
   <Bond class1="90" class2="91" length="0.09572000000000001" k="232986.04"/>
+  <Bond class1="105" class2="106" length="0.12606" k="163176.0"/>
  </AmoebaBondForce>
  <AmoebaAngleForce angle-cubic="-0.014" angle-quartic="5.6e-05" angle-pentic="-7e-07" angle-sextic="2.2e-08">
   <Angle class1="1" class2="2" class3="3" k="0.07009856064151881" angle1="109.80" inPlane="False"/>
@@ -6230,6 +6231,7 @@
   <Angle class1="56" class2="63" class3="61" k="0.05544158887101943" angle1="114.97" inPlane="True"/>
   <Angle class1="56" class2="63" class3="68" k="0.06117692565078006" angle1="119.00" inPlane="True"/>
   <Angle class1="56" class2="63" class3="76" k="0.06117692565078006" angle1="119.00" inPlane="True"/>
+  <Angle class1="106" class2="105" class3="106" k="0.197550489" angle1="120.00"  />
  </AmoebaAngleForce>
  <AmoebaOutOfPlaneBendForce type="ALLINGER" opbend-cubic="-0.014" opbend-quartic="5.6e-05" opbend-pentic="-7e-07" opbend-sextic="2.2e-08">
   <Angle class1="2" class2="1" class3="" class4="" k="0.053147454159115176"/>
@@ -6399,6 +6401,7 @@
   <Angle class1="61" class2="63" class3="56" class4="59" k="0.00898536095495832"/>
   <Angle class1="68" class2="63" class3="48" class4="56" k="0.002765706847129015"/>
   <Angle class1="76" class2="63" class3="48" class4="56" k="0.002765706847129015"/>
+  <Angle class1="106" class2="105" class3="105" class4="105" k="0.2192173"/>
  </AmoebaOutOfPlaneBendForce>
  <PeriodicTorsionForce>
   <Proper class1="3" class2="1" class3="2" class4="3"   k1="-7.96006" phase1="0.0" periodicity1="1"   k2="3.443432" phase2="3.141592653594307" periodicity2="2"   k3="2.591988" phase3="0.0" periodicity3="3" />
@@ -7488,6 +7491,7 @@
   <StretchBend class1="82" class2="79" class3="83" k1="8.397826228907983" k2="8.397826228907983" />
   <StretchBend class1="82" class2="79" class3="89" k1="8.397826228907983" k2="8.397826228907983" />
   <StretchBend class1="79" class2="83" class3="84" k1="10.515538930110866" k2="10.515538930110866" />
+  <StretchBend class1="106" class2="105" class3="106" k1="13.6555956" k2="13.6555956" />
 </AmoebaStretchBendForce>
  <AmoebaTorsionTorsionForce >
   <TorsionTorsion class1="3" class2="1" class3="2" class4="3" class5="1" grid="0" nx="25" ny="25" />
@@ -9480,6 +9484,8 @@
   <Vdw class="102" sigma="0.41200000000000003" epsilon="1.4225600000000003" reduction="1.0"/>
   <Vdw class="103" sigma="0.43200000000000005" epsilon="1.79912" reduction="1.0"/>
   <Vdw class="104" sigma="0.4610000000000001" epsilon="2.1756800000000003" reduction="1.0"/>
+  <Vdw class="105" sigma="0.371" epsilon="0.46024" reduction="1.0" />
+  <Vdw class="106" sigma="0.351" epsilon="0.46861" reduction="1.0" />
   <Pair class1="4" class2="31" sigma="0.31000000000000005" epsilon="0.16736"/>
   <Pair class1="5" class2="98" sigma="0.30000000000000004" epsilon="0.640152"/>
   <Pair class1="5" class2="99" sigma="0.327" epsilon="0.7322"/>
@@ -9937,7 +9943,7 @@
   <Multipole type="362" kz="0" kx="0" c0="-1.00000" d1="0.0" d2="0.0" d3="0.0" q11="0.0" q21="0.0" q22="0.0" q31="0.0" q32="0.0" q33="0.0"  />
   <Multipole type="363" kz="0" kx="0" c0="-1.00000" d1="0.0" d2="0.0" d3="0.0" q11="0.0" q21="0.0" q22="0.0" q31="0.0" q32="0.0" q33="0.0"  />
   <Multipole type="364" kz="365" kx="365" c0="1.07363" d1="0.0" d2="0.0" d3="0.0" q11="0.0001344" q21="0.0" q22="-0.00026896" q31="0.0" q32="0.0" q33="0.0001344"  />
-  <Multipole type="365" kz="364" kx="365" c0="-0.69121" d1="0.0" d2="0.0" d3="0.00261466" q11="-0.000467339" q21="0.0" q22="-0.0000772" q31="0.0" q32="0.0" q33="0.0005445"  />
+>   <Multipole type="365" kz="364" kx="365" c0="-0.69121" d1="0.0" d2="0.0" d3="0.00261466" q11="-0.000467339" q21="0.0" q22="-0.0000772" q31="0.0" q32="0.0" q33="0.0005445"  />
   <Polarize type="1" polarizability="0.001073" thole="0.3900" pgrp1="3" pgrp2="4" pgrp3="9" pgrp4="52" pgrp5="223" pgrp6="242" />
   <Polarize type="2" polarizability="0.0013340000000000001" thole="0.3900" pgrp1="6" />
   <Polarize type="3" polarizability="0.0013340000000000001" thole="0.3900" pgrp1="1" pgrp2="5" pgrp3="7" pgrp4="50" pgrp5="225" pgrp6="227" />
