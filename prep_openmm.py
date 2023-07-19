@@ -3,9 +3,10 @@ from __future__ import division, print_function
 
 from argparse import ArgumentParser
 
-import simtk.openmm as mm
-import simtk.unit as u
-import simtk.openmm.app as app
+import openmm as mm
+import openmm.app as app
+import parmed as pmd
+u = pmd.unit
 
 parser = ArgumentParser()
 group = parser.add_argument_group('Input/Output file options')
@@ -56,7 +57,7 @@ opt = parser.parse_args()
 print('Parsing the PDB file [%s]...' % opt.pdb)
 pdb = app.PDBFile(opt.pdb)
 
-# Declare the FF we want to use... in this case amoeba13.xml
+# Declare the FF we want to use... in this case amoeba2018.xml
 # Strip off an xml if users added it
 ff = opt.ff[:-4] if opt.ff.endswith('.xml') else opt.ff
 print('Loading the force field [%s.xml]...' % ff)
