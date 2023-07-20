@@ -4,12 +4,13 @@ import math
 
 import numpy as np
 import parmed as pmd
-from parmed import unit as u
+u = pmd.unit
 
-from simtk import openmm as mm
-from simtk.unit import *
-from simtk.openmm.app import *
-from simtk.openmm import *
+import openmm as mm
+import openmm.app as app
+from openmm.unit import *
+from openmm import *
+from openmm.app import *
 
 from argparse import ArgumentParser
 import sys
@@ -132,7 +133,7 @@ group.add_argument('-o' , '--output', dest='output', default=sys.stdout,
                    metavar='FILE', help='''Output file for energies''')
 group.add_argument('-x', '--trajectory', dest='trajectory', default='md.nc',
                    metavar='FILE', help='''NetCDF trajectory to generate.
-                   Snapshots written every --interval steps.''')
+                   Snapshots written every 10 * --interval steps.''')
 group.add_argument('--checkpoint', dest='checkpoint', metavar='FILE',
                    default=None, help='''Name of a checkpoint file to write
                    periodically throughout the simulation. Primarily useful for
@@ -310,8 +311,9 @@ else:
     print('Verlet: %8.2f fs' % opt.timestep )
 
 sim = app.Simulation(pdb.topology, system, integrator,
-                     mm.Platform.getPlatformByName('CUDA'),
-                     dict(CudaPrecision='mixed') )
+                     platform=mm.Platform.getPlatformByName('CUDA'),
+                     platformProperties=dict(CudaPrecision='mixed') )
+
 if opt.hawkeye:
     # Watch every step... slow!
     sim.reporters.append(ErrorDetectionReporter(groups_and_names))
