@@ -6795,9 +6795,8 @@
   <Polarize type="256" polarizability="0.00055" thole="0.1585" />
   <Polarize type="257" polarizability="0.00026" thole="0.2096" />
   <Polarize type="258" polarizability="0.004" thole="0.3900" />
-  <Polarize type="258" polarizability="0.004" thole="0.3900" />
-  <Polarize type="259" polarizability="0.001073" thole="0.3900" pgrp1="402" />
-  <Polarize type="260" polarizability="0.000837" thole="0.3900" pgrp1="401" />
+  <Polarize type="259" polarizability="0.001073" thole="0.3900" />
+  <Polarize type="260" polarizability="0.000837" thole="0.3900" />
  </AmoebaMultipoleForce>
  <AmoebaUreyBradleyForce cubic="0.0" quartic="0.0"  >
   <UreyBradley class1="44" class2="43" class3="44" k="-3179.84" d="0.15326" /> 

@@ -9943,7 +9943,7 @@
   <Multipole type="362" kz="0" kx="0" c0="-1.00000" d1="0.0" d2="0.0" d3="0.0" q11="0.0" q21="0.0" q22="0.0" q31="0.0" q32="0.0" q33="0.0"  />
   <Multipole type="363" kz="0" kx="0" c0="-1.00000" d1="0.0" d2="0.0" d3="0.0" q11="0.0" q21="0.0" q22="0.0" q31="0.0" q32="0.0" q33="0.0"  />
   <Multipole type="364" kz="365" kx="365" c0="1.07363" d1="0.0" d2="0.0" d3="0.0" q11="0.0001344" q21="0.0" q22="-0.00026896" q31="0.0" q32="0.0" q33="0.0001344"  />
->   <Multipole type="365" kz="364" kx="365" c0="-0.69121" d1="0.0" d2="0.0" d3="0.00261466" q11="-0.000467339" q21="0.0" q22="-0.0000772" q31="0.0" q32="0.0" q33="0.0005445"  />
+  <Multipole type="365" kz="364" kx="365" c0="-0.69121" d1="0.0" d2="0.0" d3="0.00261466" q11="-0.000467339" q21="0.0" q22="-0.0000772" q31="0.0" q32="0.0" q33="0.0005445"  />
   <Polarize type="1" polarizability="0.001073" thole="0.3900" pgrp1="3" pgrp2="4" pgrp3="9" pgrp4="52" pgrp5="223" pgrp6="242" />
   <Polarize type="2" polarizability="0.0013340000000000001" thole="0.3900" pgrp1="6" />
   <Polarize type="3" polarizability="0.0013340000000000001" thole="0.3900" pgrp1="1" pgrp2="5" pgrp3="7" pgrp4="50" pgrp5="225" pgrp6="227" />
@@ -10307,8 +10307,8 @@
   <Polarize type="361" polarizability="0.004" thole="0.3900" />
   <Polarize type="362" polarizability="0.0056500000000000005" thole="0.3900" />
   <Polarize type="363" polarizability="0.00725" thole="0.3900" />
-  <Polarize type="364" polarizability="0.001073" thole="0.3900" pgrp1="402" />
-  <Polarize type="365" polarizability="0.000837" thole="0.3900" pgrp1="401" />
+  <Polarize type="364" polarizability="0.001073" thole="0.3900" />
+  <Polarize type="365" polarizability="0.000837" thole="0.3900" />
  </AmoebaMultipoleForce>
  <AmoebaUreyBradleyForce cubic="0.0" quartic="0.0"  >
   <UreyBradley class1="91" class2="90" class3="91" k="-3179.84" d="0.15537" /> 
