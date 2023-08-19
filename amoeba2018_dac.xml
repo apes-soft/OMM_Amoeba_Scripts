@@ -6231,7 +6231,7 @@
   <Angle class1="56" class2="63" class3="61" k="0.05544158887101943" angle1="114.97" inPlane="True"/>
   <Angle class1="56" class2="63" class3="68" k="0.06117692565078006" angle1="119.00" inPlane="True"/>
   <Angle class1="56" class2="63" class3="76" k="0.06117692565078006" angle1="119.00" inPlane="True"/>
-  <Angle class1="106" class2="105" class3="106" k="0.197550489" angle1="120.00"  />
+  <Angle class1="106" class2="105" class3="106" k="0.197550489" angle1="120.00" inPlane="False"  />
  </AmoebaAngleForce>
  <AmoebaOutOfPlaneBendForce type="ALLINGER" opbend-cubic="-0.014" opbend-quartic="5.6e-05" opbend-pentic="-7e-07" opbend-sextic="2.2e-08">
   <Angle class1="2" class2="1" class3="" class4="" k="0.053147454159115176"/>
@@ -6401,7 +6401,7 @@
   <Angle class1="61" class2="63" class3="56" class4="59" k="0.00898536095495832"/>
   <Angle class1="68" class2="63" class3="48" class4="56" k="0.002765706847129015"/>
   <Angle class1="76" class2="63" class3="48" class4="56" k="0.002765706847129015"/>
-  <Angle class1="106" class2="105" class3="105" class4="105" k="0.2192173"/>
+  <Angle class1="105" class2="106" class3="105" class4="105" k="0.2192173"/>
  </AmoebaOutOfPlaneBendForce>
  <PeriodicTorsionForce>
   <Proper class1="3" class2="1" class3="2" class4="3"   k1="-7.96006" phase1="0.0" periodicity1="1"   k2="3.443432" phase2="3.141592653594307" periodicity2="2"   k3="2.591988" phase3="0.0" periodicity3="3" />
@@ -10307,8 +10307,8 @@
   <Polarize type="361" polarizability="0.004" thole="0.3900" />
   <Polarize type="362" polarizability="0.0056500000000000005" thole="0.3900" />
   <Polarize type="363" polarizability="0.00725" thole="0.3900" />
-  <Polarize type="364" polarizability="0.001073" thole="0.3900" />
-  <Polarize type="365" polarizability="0.000837" thole="0.3900" />
+  <Polarize type="364" polarizability="0.001073" thole="0.3900" pgrp1="365" />
+  <Polarize type="365" polarizability="0.000837" thole="0.3900" pgrp1="364" />
  </AmoebaMultipoleForce>
  <AmoebaUreyBradleyForce cubic="0.0" quartic="0.0"  >
   <UreyBradley class1="91" class2="90" class3="91" k="-3179.84" d="0.15537" /> 
